@@ -80,7 +80,6 @@ export class Database {
     // get any one document
 
     async getDoc(slug) {
-
         try {
             return await this.database.getDocument(
                 conf.appwrite_DatabseId,
