@@ -77,7 +77,7 @@ export class Database {
         }
     }
 
-    // get any one document 
+    // get any one document
 
     async getDoc(slug) {
         try {
