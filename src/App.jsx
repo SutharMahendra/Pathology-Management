@@ -1,15 +1,45 @@
-import Sidebar from "./components/Header/Sidebar"
+import { Outlet } from "react-router-dom"
+import { Header, Footer } from "./components"
+import { useEffect, useState } from "react"
+import authService from "./Appwrite/auth"
+import { useDispatch } from "react-redux"
+import { login, logout } from "./Feature/AuthSlice"
 
 
 function App() {
 
+  const [isLoading, setIsLoading] = useState(true)
+  const dispatch = useDispatch()
 
-  return (
+  useEffect(() => {
+    authService.getCurrentUser()
+      .then((userData) => {
+        if (userData) {
+          dispatch(login({ userData }))
+        } else {
+          dispatch(logout())
+        }
+      })
+      .finally(() => setIsLoading(false))
+  }, [])
+
+
+  return !isLoading ? (
     <>
-      <Sidebar />
-      <h1 className='bg-black w-full text-white'>hello guys </h1>
+      <Header />
+      <main>
+
+        <Outlet />
+      </main>
+      <Footer />
+
     </>
   )
+    : (
+      <div>
+        loading ...
+      </div>
+    )
 }
 
 export default App
