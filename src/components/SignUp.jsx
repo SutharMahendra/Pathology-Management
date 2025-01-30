@@ -1,64 +1,81 @@
-import authService from '../Appwrite/auth'
-import { useDispatch } from 'react-redux'
-import { login as authLogin } from '../Feature/AuthSlice'
-import { Form, Link, useNavigate } from 'react-router-dom'
+import React from 'react'
 import { useForm } from 'react-hook-form'
+import { Form, Link, useNavigate } from 'react-router-dom'
+import authService from '../Appwrite/auth'
 import { Input } from '../components'
+import { error } from 'console'
 
-
-function Login() {
+function SignUp() {
     const { register, handleSubmit } = useForm()
-    const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const loginSubmit = async (data) => {
+    const signUp = async (data) => {
         try {
-            const userLogin = await authService.login(data)
+            const user = await authService.createAccount({ ...data })
                 .then((data) => {
-                    if (userLogin) {
-                        dispatch(authLogin(data))
+                    if (user) {
                         navigate('/')
                     }
-                }).catch(
-                    console.log('error:', error)
-                )
+                })
 
         } catch (error) {
-            console.log('error at login page', error)
+            console.log('error at sign up page', error)
         }
     }
 
     return (
-        <div className='flex items-center justify-center min-h-screen bg-gray-50'>
-            <div className='w-full max-w-md bg-white rounded-lg shadow p-8'>
+        <div className='flex items-center m-5 justify-center '>
+            <div className='w-full m-5 px-2 py2 '>
                 <div className="mb-6 flex justify-center">
                     <span className="inline-block max-w-[100px]">
                         <Logo width="100%" />
                     </span>
                 </div>
-                <h2>Sign in to yur account ?</h2>
+
+                <h2>
+                    create your account
+                </h2>
                 <p>
-                    Dont have account ?
+                    Already have account?
                     <Link
                         to='/signup'
-                        className='font-medium text-primary hover:underline hover:text-2xl'
+                        className='hover:text-2xl hover:text-blue-400'
                     >
-                        Sign-Up
+                        SignUp
                     </Link>
                 </p>
-
-                {error && <p className='text-red-500 mt-4 text-center'></p>}
-
-                {/* form section  */}
-                <Form onSubmit={handleSubmit(loginSubmit)}>
-                    {/* name input section */}
-                    <div>
-
-
+                <Form onSubmit={handleSubmit(signUp)} >
+                    <div className='px-4 py-2 mt-2'>
+                        {/* full name section */}
                         <Input
-                            label='Email'
-                            placeholder='enter your email'
-                            className='px-4 py-2 mt-3 rounded-md'
+                            label='Name'
+                            placeholder='enter your name'
+                            className='px-4 py-2 '
+                            {...register('name', {
+                                required: true,
+                                validate: {
+                                    mathcPattern: (value) =>
+                                        /^[A-Za-z]+$/i.test(value) ||
+                                        'enter valid name'
+                                },
+                                minLength: {
+                                    value: 4,
+                                    message: 'minimum 3 characters are required'
+                                },
+                                maxLength: {
+                                    value: 50,
+                                    message: 'your name should be less than 50 character'
+                                }
+                            })}
+                        />
+                        {error.name && <p className='text-red-500 mt-1 text-sm'>{error.name}</p>}
+                    </div>
+
+                    {/* email section */}
+                    <div>
+                        <Input
+                            label='Email:'
+                            placeholder='enter email'
                             {...register('email', {
                                 required: true,
                                 validate: {
@@ -74,11 +91,10 @@ function Login() {
 
                     {/* password section */}
                     <div>
-
                         <Input
                             label='Password'
                             type='password'
-                            className='px-4 py-2 mt-3 rounded-md'
+                            placeholder='enter password'
                             {...register('password'), {
                                 required: true,
                                 validate: {
@@ -92,22 +108,21 @@ function Login() {
                         {error.password && <p className='text-red-500 mt-1 text-sm'>{error.password}</p>}
 
                     </div>
-
                     <div>
                         <button
                             type='submit'
-                            className='w-full p-3 bg-amber-300'
+                            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
                         >
-                            Sign In
+                            Sign Up
                         </button>
                     </div>
 
-
                 </Form>
+
             </div>
 
         </div>
     )
 }
 
-export default Login
+export default SignUp
